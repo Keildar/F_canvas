@@ -12,8 +12,8 @@
 	function Circle(x, y, color) {
 		this.x = x;
 		this.y = y;
-		this.vx = Math.random()*10;
-		this.vy = Math.random()*10;
+		this.vx = Math.random()*10-5;
+		this.vy = Math.random()*10-5;
 		this.color = color;
 	}
 		
@@ -41,6 +41,12 @@
 		context.arc(circle.x, circle.y, 30, 0, degreesToRadians(360), true);
 		context.fillStyle = circle.color;
 		context.fill();
+			if (circle.x + circle.vx > canvas.width || circle.x + circle.vx < 0)
+				circle.vx = -circle.vx;
+			if (circle.y + circle.vy > canvas.height || circle.y + circle.vy < 0)
+				circle.vy = -circle.vy;
+		circle.x += circle.vx;
+		circle.y += circle.vy;
 	}
 	function degreesToRadians(degrees) {
 		return (degrees * Math.PI)/180;
@@ -50,18 +56,27 @@
 		canvas.width = window.innerWidth-25;
 		canvas.height = window.innerHeight-25;
 		fillBackgroundColor();
+		
+		for(var i = 0; i < circles.length; i++)
+		{
+			drawCircle(circles[i]);
+		}
 	}
 	function fillBackgroundColor() {
 		context.fillStyle = 'black';
 		context.fillRect(0, 0, canvas.width, canvas.height);
+		drawText();
+	}
+	function drawText() {
 		context.font = '35px Arial';
 		context.fillStyle = 'white';
 		context.fillText('CLICK AWAY AS MUCH AS YOU WANT', 50, 130);
 		context.fillText('     AND AS FAST AS YOU PLEASE', 50, 160);
 	}
-	function moveCircles() {
+/*	function moveCircles() {
 	//partially clear the screen to fade previous circles, and draw a new particle at each new coordinate
 	// context.globalCompositeOperation = "source-over";
+	drawText();
 	context.fillStyle = "rgba(0, 0, 0, 0.3)";
 	//context.fillRect(0, 0, canvas.width, canvas.height);
 	//context.globalCompositeOperation = "lighter";
@@ -80,7 +95,7 @@
 			//c.radius -= 1;
 		}
 	}
- 
+ */
  	function init() {
 		canvas = document.getElementById('canvas');
 		context = canvas.getContext('2d');
@@ -92,7 +107,7 @@
 		canvas.onclick = function(event) {
 			handleClick(event.clientX, event.clientY);
 		}
-		timer = setInterval(moveCircles, 100);
+		timer = setInterval(resizeCanvas, 5);
 	}
  
 	window.onload = init;
