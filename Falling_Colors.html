@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+	<title>Sad Attempt at Canvas: Photographing Falling Colors</title>
+	<script>
+	var canvas;
+	var context;
+	var circles = [];
+	var timer;
+
+	
+	function Circle(x, y, color) {
+		this.x = x;
+		this.y = y;
+		this.vx = Math.random()*10;
+		this.vy = Math.random()*10;
+		this.color = color;
+	}
+		
+	function handleClick(x, y) {
+		var found = false;
+			for (var i=0; i<circles.length; i++) {		
+				d = Math.sqrt((circles[i].x - x)*(circles[i].x - x)+(circles[i].y - y)*(circles[i].y - y));
+					if (d <= 30) {
+						circles.splice(i, 1);
+						found = true;
+					}
+			}
+			fillBackgroundColor();
+			if (!found) {
+			var colors = ['red', 'green', 'blue', 'yellow', 'orange', 'purple', 'black'];
+			var color = colors[Math.floor(Math.random()*colors.length)];
+			circles.push(new Circle(x, y, color));
+			}
+				for (var i=0; i<circles.length; i++) {
+					drawCircle(circles[i]);
+				}
+	}
+	function drawCircle(circle) {
+		context.beginPath();
+		context.arc(circle.x, circle.y, 30, 0, degreesToRadians(360), true);
+		context.fillStyle = circle.color;
+		context.fill();
+	}
+	function degreesToRadians(degrees) {
+		return (degrees * Math.PI)/180;
+	}
+
+	function resizeCanvas() {
+		canvas.width = window.innerWidth-25;
+		canvas.height = window.innerHeight-25;
+		fillBackgroundColor();
+	}
+	function fillBackgroundColor() {
+		context.fillStyle = 'black';
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.font = '35px Arial';
+		context.fillStyle = 'white';
+		context.fillText('CLICK AWAY AS MUCH AS YOU WANT', 50, 130);
+		context.fillText('     AND AS FAST AS YOU PLEASE', 50, 160);
+	}
+	function moveCircles() {
+	//partially clear the screen to fade previous circles, and draw a new particle at each new coordinate
+	// context.globalCompositeOperation = "source-over";
+	context.fillStyle = "rgba(0, 0, 0, 0.3)";
+	//context.fillRect(0, 0, canvas.width, canvas.height);
+	//context.globalCompositeOperation = "lighter";
+		for(var i = 0; i < circles.length; i++) {
+			var c = circles[i];
+			context.beginPath();
+			context.arc(c.x, c.y, c.radius, 0, degreesToRadians(360), true);
+			context.fillStyle = c.color;
+			context.fill();
+			c.x += c.vx;
+			c.y += c.vy;
+			if(c.x < -50) c.x = canvas.width+50;
+			if(c.y < -50) c.y = canvas.height+50;
+			if(c.x > canvas.width+50) c.x = -50;
+			if(c.y > canvas.height+50) c.y = -50;
+			//c.radius -= 1;
+		}
+	}
+ 
+ 	function init() {
+		canvas = document.getElementById('canvas');
+		context = canvas.getContext('2d');
+
+		window.addEventListener('resize', resizeCanvas, false);
+		window.addEventListener('orientationchange', resizeCanvas, false);
+		resizeCanvas();
+			
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		}
+		timer = setInterval(moveCircles, 100);
+	}
+ 
+	window.onload = init;
+	</script>
+</head>
+<body>
+	<canvas id='canvas' height=500 width=500></canvas>
+</body>
+</html>
