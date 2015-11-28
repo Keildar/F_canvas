@@ -1,28 +1,51 @@
 <!doctype html>
 <html>
 <head>
-	<title>Sad Attempt at Canvas: Photographing Falling Colors</title>
+	<title>Chaos</title>
 	<script>
 	var canvas;
 	var context;
-	var circles = [];
+	var shapes = [];
 	var timer;
-
+	var allShapes = ['circle', 'spiral', 'star'/*, 'd', 'text'*/];
 	
-	function Circle(x, y, color) {
+	function Shapes(x, y, color) {
 		this.x = x;
 		this.y = y;
+		this.size = Math.random()*30+10;
 		this.vx = Math.random()*10-5;
 		this.vy = Math.random()*10-5;
+		this.cx = x;
+		this.cy = y;
+		this.spike = 5;
+		this.oR = 30;
+		this.iR = 15;
 		this.color = color;
+		this.shape = allShapes[Math.floor(Math.random()*allShapes.length)];
 	}
-		
+	
+	function init() {
+		canvas = document.getElementById('canvas');
+		context = canvas.getContext('2d');
+
+		window.addEventListener('resize', resizeCanvas, false);
+		window.addEventListener('orientationchange', resizeCanvas, false);
+		resizeCanvas();
+			
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		}
+		timer = setInterval(resizeCanvas, 10);
+	}
+	
+	
+	
 	function handleClick(x, y) {
 		var found = false;
-			for (var i=0; i<circles.length; i++) {		
-				d = Math.sqrt((circles[i].x - x)*(circles[i].x - x)+(circles[i].y - y)*(circles[i].y - y));
+			for (var i=0; i<shapes.length; i++) {		
+				d = Math.sqrt((shapes[i].x - x)*(shapes[i].x - x)+(shapes[i].y - y)*(shapes[i].y - y));
 					if (d <= 30) {
-						circles.splice(i, 1);
+						shapes.splice(i, 1);
 						found = true;
 					}
 			}
@@ -30,15 +53,13 @@
 			if (!found) {
 			var colors = ['red', 'green', 'blue', 'yellow', 'orange', 'purple', 'black'];
 			var color = colors[Math.floor(Math.random()*colors.length)];
-			circles.push(new Circle(x, y, color));
+			shapes.push(new Shapes(x, y, color));
 			}
-				for (var i=0; i<circles.length; i++) {
-					drawCircle(circles[i]);
-				}
 	}
+		
 	function drawCircle(circle) {
 		context.beginPath();
-		context.arc(circle.x, circle.y, 30, 0, degreesToRadians(360), true);
+		context.arc(circle.x, circle.y, circle.size, 0, degreesToRadians(360), true);
 		context.fillStyle = circle.color;
 		context.fill();
 			if (circle.x + circle.vx > canvas.width || circle.x + circle.vx < 0)
@@ -48,31 +69,116 @@
 		circle.x += circle.vx;
 		circle.y += circle.vy;
 	}
-	function degreesToRadians(degrees) {
-		return (degrees * Math.PI)/180;
-	}
 
-	function resizeCanvas() {
-		canvas.width = window.innerWidth-25;
-		canvas.height = window.innerHeight-25;
-		fillBackgroundColor();
+	function drawSpiral(spiral) {
+		var radius = 0;
+		var angle = 0;
+		context.size = Math.random()*60-30;
 		
-		for(var i = 0; i < circles.length; i++)
-		{
-			drawCircle(circles[i]);
+		context.save();
+		context.beginPath();
+		context.lineWidth = 5;
+		for (var n = 0; n < context.size; n++) {
+			radius += 0.75;
+		// make a complete circle every 50 iterations
+			angle += (Math.PI * 2) / 16;
+			var x = spiral.x + radius * Math.cos(angle);
+			var y = spiral.y + radius * Math.sin(angle);
+			context.lineTo(x, y);
 		}
+		context.strokeStyle = spiral.color;	
+		context.stroke();
+		context.restore();
+		
+
 	}
-	function fillBackgroundColor() {
-		context.fillStyle = 'black';
-		context.fillRect(0, 0, canvas.width, canvas.height);
-		drawText();
+	
+	function drawStar(star) {
+		var rot = Math.PI / 2 * 3;
+		var step = Math.PI / star.spike;
+
+		context.strokeSyle = "#000";
+		context.beginPath();
+		context.moveTo(star.cx, star.cy - star.oR)
+		for (i = 0; i < star.spike; i++) {
+			x = star.cx + Math.cos(rot) * star.oR;
+			y = star.cy + Math.sin(rot) * star.oR;
+			context.lineTo(x, y)
+			rot += step
+			
+			x = star.cx + Math.cos(rot) * star.iR;
+			y = star.cy + Math.sin(rot) * star.iR;
+			context.lineTo(x, y)
+			rot += step
+		}
+		context.lineTo(star.cx, star.cy - star.oR)
+		context.closePath();
+		context.lineWidth = 5;
+		context.strokeStyle = star.color;
+		context.stroke();
+		
+		
 	}
+/*	
+	function drawD() {
+		context.beginPath();
+		context.moveTo(cloud.x, cloud.y);
+		context.bezierCurveTo(cloud.x-40, cloud.y+20, cloud.x-40, cloud.y+70, cloud.x+60, cloud.y+70);
+		context.bezierCurveTo(cloud.x+80, cloud.y+100, cloud.x+170, cloud.y+100, cloud.x+170, cloud.y+70);
+		context.bezierCurveTo(cloud.x+250, cloud.y+70, cloud.x+250, cloud.y+40, cloud.x+210, cloud.y+20);
+		context.bezierCurveTo(cloud.x+260, cloud.y-40, cloud.x+200, cloud.y+50, cloud.x+170, cloud.y-30);
+		context.bezierCurveTo(cloud.x+150, cloud.y-75, cloud.x+80, cloud.y-60, cloud.x+80, cloud.y-30);
+		context.bezierCurveTo(cloud.x+30, cloud.y-75, cloud.x-20, cloud.y-60, cloud.x, cloud.y);
+	}
+	
+	function drawE() {
+	
+	}
+*/	
 	function drawText() {
 		context.font = '35px Arial';
 		context.fillStyle = 'white';
 		context.fillText('CLICK AWAY AS MUCH AS YOU WANT', 50, 130);
 		context.fillText('     AND AS FAST AS YOU PLEASE', 50, 160);
 	}
+	
+	function resizeCanvas() {
+		canvas.width = window.innerWidth-25;
+		canvas.height = window.innerHeight-25;
+		fillBackgroundColor();
+		
+		for(var i = 0; i < shapes.length; i++)	{
+			if(shapes[i].shape == 'circle') {
+				drawCircle(shapes[i]);
+			} else if(shapes[i].shape == 'spiral') {
+				drawSpiral(shapes[i], 75, 100, 5, 30, 15);
+			} else if(shapes[i].shape == 'star') {
+				drawStar(shapes[i]);
+			}// else if (shapes[i].shape == 'd') {
+		//		drawD(shapes[i]);
+		//	} else if(shapes[i].shape == 'e') {
+		//		drawE(shapes[i]);
+		//	}
+		}
+			if (shapes.x + shapes.vx > canvas.width || shapes.x + shapes.vx < 0)
+				shapes.vx = -shapes.vx;
+			if (shapes.y + shapes.vy > canvas.height || shapes.y + shapes.vy < 0)
+				shapes.vy = -shapes.vy;
+		shapes.x += shapes.vx;
+		shapes.y += shapes.vy;
+	}
+	
+	function fillBackgroundColor() {
+		context.fillStyle = 'black';
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		drawText();
+	}
+	
+	function degreesToRadians(degrees) {
+		return (degrees * Math.PI)/180;
+	}
+	
+	
 /*	function moveCircles() {
 	//partially clear the screen to fade previous circles, and draw a new particle at each new coordinate
 	// context.globalCompositeOperation = "source-over";
@@ -96,19 +202,6 @@
 		}
 	}
  */
- 	function init() {
-		canvas = document.getElementById('canvas');
-		context = canvas.getContext('2d');
-
-		window.addEventListener('resize', resizeCanvas, false);
-		window.addEventListener('orientationchange', resizeCanvas, false);
-		resizeCanvas();
-			
-		canvas.onclick = function(event) {
-			handleClick(event.clientX, event.clientY);
-		}
-		timer = setInterval(resizeCanvas, 5);
-	}
  
 	window.onload = init;
 	</script>
