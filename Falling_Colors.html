@@ -7,7 +7,8 @@
 	var context;
 	var shapes = [];
 	var timer;
-	var allShapes = ['circle', 'spiral', 'star'/*, 'd', 'text'*/];
+	var allShapes = ['circle', 'spiral', 'star'/*, 'd'*/, 'texts'];
+	var arrayT = ['POP', 'BOOOM', 'SHAAA', 'BEEP', 'BLOOP', 'BRRRING', 'DING', 'PING', 'RIIIING', 'CHICKENS', 'SHINY STUFF', 'OMG', 'WHAT THE-', 'OOOOOO, SHINY', 'HELLO THERE', 'STOP CLICKING ME', 'OUCH', 'I\'M TOO OLD TO BE CLICKED ON', 'OI! STOP!', 'TOO MANY OBJECTS', 'THE END IS NIGH', 'WHAT HAVE YOU DONE!?', 'SO PRETTY', 'ART?', 'IT\'S GETTING CRAZY IN HERE', 'CLICK MUCH?', 'I HOPE YOU\'RE HAVING FUN', '...'];
 	
 	function Shapes(x, y, color) {
 		this.x = x;
@@ -20,6 +21,7 @@
 		this.spike = 5;
 		this.oR = 30;
 		this.iR = 15;
+		this.words = arrayT[Math.floor(Math.random()*arrayT.length)];
 		this.color = color;
 		this.shape = allShapes[Math.floor(Math.random()*allShapes.length)];
 	}
@@ -35,7 +37,7 @@
 		canvas.onclick = function(event) {
 			handleClick(event.clientX, event.clientY);
 		}
-		timer = setInterval(resizeCanvas, 10);
+		timer = setInterval(resizeCanvas, 15);
 	}
 	
 	
@@ -73,7 +75,7 @@
 	function drawSpiral(spiral) {
 		var radius = 0;
 		var angle = 0;
-		context.size = Math.random()*60-30;
+		context.size = Math.random()*80-30;
 		
 		context.save();
 		context.beginPath();
@@ -116,6 +118,10 @@
 		context.lineWidth = 5;
 		context.strokeStyle = star.color;
 		context.stroke();
+		star.oR -= 1;
+		if (star.oR === 1) {
+			star.oR = 30;
+		}
 		
 		
 	}
@@ -130,13 +136,36 @@
 		context.bezierCurveTo(cloud.x+150, cloud.y-75, cloud.x+80, cloud.y-60, cloud.x+80, cloud.y-30);
 		context.bezierCurveTo(cloud.x+30, cloud.y-75, cloud.x-20, cloud.y-60, cloud.x, cloud.y);
 	}
-	
-	function drawE() {
-	
-	}
 */	
+	function drawTexts(texts) {
+		context.font = '20px Comic Sans MS';
+		context.fillStyle = texts.color; //colorsT[Math.floor(Math.random()*colorsT.length)];
+		context.fillText(texts.words, texts.x, texts.y);
+		texts.x += texts.vx;
+	//loop dat stuff woooo
+		if (texts.x < canvas.width && texts.x + texts.size > 0 &&
+			texts.y < canvas.height && texts.y + texts.size > 0)
+		{
+			texts.looped = false;
+		} else {
+			if (texts.x > canvas.width && !texts.looped) {
+				texts.x = -texts.size;
+			}
+			if (texts.x + texts.size < 0 && !texts.looped) {
+				texts.x = texts.size + canvas.width;
+			}
+			if (texts.y > canvas.height && !texts.looped) {
+				texts.y = -texts.size;
+			}
+			if (texts.y + texts.size < 0 && !texts.looped) {
+				texts.y = texts.size + canvas.height;
+			}
+			texts.looped = true;
+		}
+	}
+	
 	function drawText() {
-		context.font = '35px Arial';
+		context.font = '35px Trebuchet MS';
 		context.fillStyle = 'white';
 		context.fillText('CLICK AWAY AS MUCH AS YOU WANT', 50, 130);
 		context.fillText('     AND AS FAST AS YOU PLEASE', 50, 160);
@@ -154,11 +183,11 @@
 				drawSpiral(shapes[i], 75, 100, 5, 30, 15);
 			} else if(shapes[i].shape == 'star') {
 				drawStar(shapes[i]);
-			}// else if (shapes[i].shape == 'd') {
-		//		drawD(shapes[i]);
-		//	} else if(shapes[i].shape == 'e') {
-		//		drawE(shapes[i]);
-		//	}
+			}/* else if (shapes[i].shape == 'd') {
+				drawD(shapes[i]);
+			}*/ else if(shapes[i].shape == 'texts') {
+				drawTexts(shapes[i]);
+			}
 		}
 			if (shapes.x + shapes.vx > canvas.width || shapes.x + shapes.vx < 0)
 				shapes.vx = -shapes.vx;
