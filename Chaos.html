@@ -7,7 +7,7 @@
 	var context;
 	var shapes = [];
 	var timer;
-	var allShapes = ['circle', 'spiral', 'star'/*, 'd'*/, 'texts'];
+	var allShapes = ['circle', 'spiral', 'star', 'heart', 'texts'];
 	var arrayT = ['POP', 'BOOOM', 'SHAAA', 'BEEP', 'BLOOP', 'BRRRING', 'DING', 'PING', 'RIIIING', 'CHICKENS', 'SHINY STUFF', 'OMG', 'WHAT THE-', 'OOOOOO, SHINY', 'HELLO THERE', 'STOP CLICKING ME', 'OUCH', 'I\'M TOO OLD TO BE CLICKED ON', 'OI! STOP!', 'TOO MANY OBJECTS', 'THE END IS NIGH', 'WHAT HAVE YOU DONE!?', 'SO PRETTY', 'ART?', 'IT\'S GETTING CRAZY IN HERE', 'CLICK MUCH?', 'I HOPE YOU\'RE HAVING FUN', '...'];
 	
 	function Shapes(x, y, color) {
@@ -125,21 +125,45 @@
 		
 		
 	}
-/*	
-	function drawD() {
+	
+	function drawHeart(heart) {
 		context.beginPath();
-		context.moveTo(cloud.x, cloud.y);
-		context.bezierCurveTo(cloud.x-40, cloud.y+20, cloud.x-40, cloud.y+70, cloud.x+60, cloud.y+70);
-		context.bezierCurveTo(cloud.x+80, cloud.y+100, cloud.x+170, cloud.y+100, cloud.x+170, cloud.y+70);
-		context.bezierCurveTo(cloud.x+250, cloud.y+70, cloud.x+250, cloud.y+40, cloud.x+210, cloud.y+20);
-		context.bezierCurveTo(cloud.x+260, cloud.y-40, cloud.x+200, cloud.y+50, cloud.x+170, cloud.y-30);
-		context.bezierCurveTo(cloud.x+150, cloud.y-75, cloud.x+80, cloud.y-60, cloud.x+80, cloud.y-30);
-		context.bezierCurveTo(cloud.x+30, cloud.y-75, cloud.x-20, cloud.y-60, cloud.x, cloud.y);
+		context.moveTo(heart.x, heart.y);
+		context.bezierCurveTo(heart.x, heart.y, heart.x+35, heart.y-50, heart.x+40, heart.y);
+		context.bezierCurveTo(heart.x+40, heart.y, heart.x+35, heart.y+40, heart.x, heart.y+80);
+		context.bezierCurveTo(heart.x, heart.y+80, heart.x-35, heart.y+40, heart.x-40, heart.y);
+		context.bezierCurveTo(heart.x-40, heart.y, heart.x-35, heart.y-50, heart.x, heart.y);
+		
+		context.closePath();
+		context.lineWidth = 5;
+		context.fillStyle = heart.color;
+		context.fill();
+		
+		heart.y += heart.vy;
+		if (heart.x < canvas.width && heart.x + heart.size > 0 &&
+			heart.y < canvas.height && heart.y + heart.size > 0)
+		{
+			heart.looped = false;
+		} else {
+			if (heart.x > canvas.width && !heart.looped) {
+				heart.x = -heart.size;
+			}
+			if (heart.x + heart.size < 0 && !heart.looped) {
+				heart.x = heart.size + canvas.width;
+			}
+			if (heart.y > canvas.height && !heart.looped) {
+				heart.y = -heart.size;
+			}
+			if (heart.y + heart.size < 0 && !heart.looped) {
+				heart.y = heart.size + canvas.height;
+			}
+			heart.looped = true;
+		}
 	}
-*/	
+	
 	function drawTexts(texts) {
 		context.font = '20px Comic Sans MS';
-		context.fillStyle = texts.color; //colorsT[Math.floor(Math.random()*colorsT.length)];
+		context.fillStyle = texts.color;
 		context.fillText(texts.words, texts.x, texts.y);
 		texts.x += texts.vx;
 	//loop dat stuff woooo
@@ -183,9 +207,9 @@
 				drawSpiral(shapes[i], 75, 100, 5, 30, 15);
 			} else if(shapes[i].shape == 'star') {
 				drawStar(shapes[i]);
-			}/* else if (shapes[i].shape == 'd') {
-				drawD(shapes[i]);
-			}*/ else if(shapes[i].shape == 'texts') {
+			} else if (shapes[i].shape == 'heart') {
+				drawHeart(shapes[i]);
+			} else if(shapes[i].shape == 'texts') {
 				drawTexts(shapes[i]);
 			}
 		}
@@ -237,5 +261,8 @@
 </head>
 <body>
 	<canvas id='canvas' height=500 width=500></canvas>
+	<audio loop autoplay>
+		<source src="BCCGS.mp3" type="audio/mp3">
+	</audio>
 </body>
 </html>
